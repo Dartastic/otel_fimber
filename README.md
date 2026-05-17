@@ -27,7 +27,6 @@ import 'package:otel_fimber/otel_fimber.dart';
 Future<void> main() async {
   await OTel.initialize(
     serviceName: 'my-app',
-    endpoint: 'http://localhost:4317',
   );
 
   Fimber.plantTree(DebugTree());        // keep dev console output
