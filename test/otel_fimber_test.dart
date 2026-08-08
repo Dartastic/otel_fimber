@@ -91,8 +91,15 @@ void main() {
       final attrMap = {
         for (final a in rec.attributes!.toList()) a.key: a.value,
       };
-      expect(attrMap['exception.type'], 'StateError');
-      expect(attrMap['exception.message'], contains('boom'));
+      expect(attrMap[ExceptionAttributes.exceptionType.key], 'StateError');
+      expect(
+        attrMap[ExceptionAttributes.exceptionMessage.key],
+        contains('boom'),
+      );
+      expect(
+        attrMap[ExceptionAttributes.exceptionStacktrace.key],
+        isNotNull,
+      );
     });
 
     test('respects zone-scoped suppression', () async {

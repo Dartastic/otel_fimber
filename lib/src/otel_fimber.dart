@@ -6,6 +6,27 @@ import 'package:fimber/fimber.dart' as fimber_lib;
 
 import 'otel_fimber_suppression.dart';
 
+/// Attribute keys for Fimber-specific log metadata that has no
+/// upstream semantic-convention registry entry yet.
+///
+/// The exception attributes on records use the registry's
+/// `exception.*` keys ([ExceptionAttributes]); this enum covers only
+/// the Fimber tag. If the registry grows a matching convention,
+/// these can `@Deprecated`-pivot.
+enum FimberLogSemantics implements OTelSemantic {
+  /// The Fimber tag for the log call — either the explicit `tag:`
+  /// argument or Fimber's auto-derived caller tag.
+  logTag('log.tag');
+
+  const FimberLogSemantics(this.key);
+
+  @override
+  final String key;
+
+  @override
+  String toString() => key;
+}
+
 /// A `package:fimber` [LogTree] that mirrors every event into the
 /// OpenTelemetry logs pipeline.
 ///
@@ -32,9 +53,11 @@ import 'otel_fimber_suppression.dart';
 ///   (`V`/`T` → TRACE, `D` → DEBUG, `I` → INFO, `W` → WARN,
 ///   `E` → ERROR, `F` → FATAL).
 /// - `severity_text` — the original Fimber level string.
-/// - attributes — `log.tag` (when present), and
-///   `exception.type` / `exception.message` / `exception.stacktrace`
-///   when `ex` / `stacktrace` are set.
+/// - attributes — [FimberLogSemantics.logTag] (when present), and the
+///   registry's [ExceptionAttributes.exceptionType] /
+///   [ExceptionAttributes.exceptionMessage] /
+///   [ExceptionAttributes.exceptionStacktrace] when `ex` /
+///   `stacktrace` are set.
 ///
 /// Records inherit `trace_id` / `span_id` from `Context.current`, so
 /// log calls inside a `Tracer.startActiveSpan` block are
@@ -89,22 +112,22 @@ class OTelFimberTree extends fimber_lib.LogTree {
 
     final attrs = <Attribute<Object>>[];
     if (tag != null && tag.isNotEmpty) {
-      attrs.add(OTel.attributeString('log.tag', tag));
+      attrs.add(OTel.attributeString(FimberLogSemantics.logTag.key, tag));
     }
     if (ex != null) {
       attrs
         ..add(OTel.attributeString(
-          'exception.type',
+          ExceptionAttributes.exceptionType.key,
           ex.runtimeType.toString(),
         ))
         ..add(OTel.attributeString(
-          'exception.message',
+          ExceptionAttributes.exceptionMessage.key,
           ex.toString(),
         ));
     }
     if (_includeStackTrace && stacktrace != null) {
       attrs.add(OTel.attributeString(
-        'exception.stacktrace',
+        ExceptionAttributes.exceptionStacktrace.key,
         stacktrace.toString(),
       ));
     }
