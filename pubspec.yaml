@@ -3,7 +3,7 @@ description: >-
   OpenTelemetry log bridge for package:fimber. Plant an OTel LogTree beside
   Fimber's debug tree and every call is mirrored into the OTel logs
   pipeline, inheriting trace_id/span_id.
-version: 0.3.0-wip
+version: 0.3.0
 repository: https://github.com/dartastic/otel_fimber
 homepage: https://dartastic.io
 

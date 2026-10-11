@@ -14,7 +14,7 @@ auto-correlated.
 ```yaml
 dependencies:
   fimber: ^0.7.0
-  otel_fimber: ^0.2.0
+  otel_fimber: ^0.3.0
 ```
 
 ## Use
