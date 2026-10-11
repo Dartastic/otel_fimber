@@ -1,7 +1,7 @@
 // Licensed under the Apache License, Version 2.0
 // Copyright 2025, Mindful Software LLC, All rights reserved.
 
-import 'package:dartastic_opentelemetry/dartastic_opentelemetry.dart';
+import 'package:dartastic_opentelemetry_api/dartastic_opentelemetry_api.dart';
 import 'package:fimber/fimber.dart' as fimber_lib;
 
 import 'otel_fimber_suppression.dart';
@@ -78,7 +78,7 @@ class OTelFimberTree extends fimber_lib.LogTree {
   ///   Defaults to `false`; the tag is always exported as a
   ///   `log.tag` attribute regardless.
   OTelFimberTree({
-    LoggerProvider? loggerProvider,
+    APILoggerProvider? loggerProvider,
     String loggerName = 'package.fimber',
     List<String>? levels,
     bool includeStackTrace = true,
@@ -89,7 +89,7 @@ class OTelFimberTree extends fimber_lib.LogTree {
         _includeStackTrace = includeStackTrace,
         _prependTag = prependTag;
 
-  final LoggerProvider? _provider;
+  final APILoggerProvider? _provider;
   final String _loggerName;
   final List<String> _levels;
   final bool _includeStackTrace;
@@ -107,26 +107,26 @@ class OTelFimberTree extends fimber_lib.LogTree {
     StackTrace? stacktrace,
   }) {
     if (fimberInstrumentationSuppressed()) return;
-    final provider = _provider ?? OTel.loggerProvider();
+    final provider = _provider ?? OTelAPI.loggerProvider();
     final logger = provider.getLogger(_loggerName);
 
     final attrs = <Attribute<Object>>[];
     if (tag != null && tag.isNotEmpty) {
-      attrs.add(OTel.attributeString(FimberLogSemantics.logTag.key, tag));
+      attrs.add(OTelAPI.attributeString(FimberLogSemantics.logTag.key, tag));
     }
     if (ex != null) {
       attrs
-        ..add(OTel.attributeString(
+        ..add(OTelAPI.attributeString(
           ExceptionAttributes.exceptionType.key,
           ex.runtimeType.toString(),
         ))
-        ..add(OTel.attributeString(
+        ..add(OTelAPI.attributeString(
           ExceptionAttributes.exceptionMessage.key,
           ex.toString(),
         ));
     }
     if (_includeStackTrace && stacktrace != null) {
-      attrs.add(OTel.attributeString(
+      attrs.add(OTelAPI.attributeString(
         ExceptionAttributes.exceptionStacktrace.key,
         stacktrace.toString(),
       ));
@@ -141,7 +141,7 @@ class OTelFimberTree extends fimber_lib.LogTree {
       severityNumber: _mapLevel(level),
       severityText: level,
       body: body,
-      attributes: attrs.isEmpty ? null : OTel.attributes(attrs),
+      attributes: attrs.isEmpty ? null : OTelAPI.attributes(attrs),
     );
   }
 }
